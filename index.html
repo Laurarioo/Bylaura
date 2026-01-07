@@ -1,1 +1,942 @@
-fgfgfegf
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ToolPro — Intranet</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#0f1a30;
+      --panel2:#0c162a;
+      --text:#e7eefc;
+      --muted:#a7b6d6;
+      --border:rgba(255,255,255,.10);
+      --accent:#5eead4;
+      --accent2:#60a5fa;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --good:#34d399;
+
+      --radius:16px;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--font);
+      background:
+        radial-gradient(1200px 600px at 15% -10%, rgba(96,165,250,.18), transparent 60%),
+        radial-gradient(1000px 600px at 100% 0%, rgba(94,234,212,.12), transparent 50%),
+        linear-gradient(180deg, #070b14, #0b1220 35%, #070b14);
+      color:var(--text);
+    }
+    a{color:inherit; text-decoration:none}
+    .app{
+      display:grid;
+      grid-template-columns: 280px 1fr;
+      min-height:100vh;
+    }
+
+    /* Sidebar */
+    .sidebar{
+      position:sticky;
+      top:0;
+      height:100vh;
+      padding:22px 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border-right:1px solid var(--border);
+      backdrop-filter: blur(10px);
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:10px 10px 18px;
+      border-bottom:1px solid var(--border);
+      margin-bottom:14px;
+    }
+    .logo{
+      width:40px;height:40px;border-radius:12px;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      box-shadow: 0 10px 25px rgba(96,165,250,.25);
+    }
+    .brand h1{
+      margin:0;
+      font-size:16px;
+      letter-spacing:.2px;
+      line-height:1.2;
+    }
+    .brand small{color:var(--muted); display:block; margin-top:2px}
+    .nav{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      padding:10px 6px;
+    }
+    .nav a{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius:12px;
+      color:var(--muted);
+      border:1px solid transparent;
+    }
+    .nav a:hover{
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+    }
+    .nav a.active{
+      background: rgba(94,234,212,.10);
+      border-color: rgba(94,234,212,.25);
+      color:var(--text);
+    }
+    .chip{
+      margin-left:auto;
+      font-size:12px;
+      padding:2px 8px;
+      border-radius:999px;
+      background:rgba(255,255,255,.08);
+      border:1px solid var(--border);
+      color:var(--muted);
+    }
+    .sidebar-footer{
+      position:absolute;
+      left:16px;
+      right:16px;
+      bottom:16px;
+      padding:14px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.04);
+    }
+    .sidebar-footer .row{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+    }
+    .pill{
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.05);
+      color:var(--muted);
+    }
+
+    /* Main */
+    .main{
+      padding:22px 24px 30px;
+    }
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:18px;
+    }
+    .search{
+      flex:1;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      max-width:720px;
+      padding:12px 14px;
+      border-radius:14px;
+      background:rgba(255,255,255,.04);
+      border:1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+    .search input{
+      width:100%;
+      outline:none;
+      border:none;
+      background:transparent;
+      color:var(--text);
+      font-size:14px;
+    }
+    .search input::placeholder{color:rgba(167,182,214,.75)}
+    .actions{
+      display:flex; align-items:center; gap:10px;
+    }
+    .btn{
+      cursor:pointer;
+      border:none;
+      background:rgba(255,255,255,.05);
+      color:var(--text);
+      border:1px solid var(--border);
+      padding:10px 12px;
+      border-radius:12px;
+      font-size:14px;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+    }
+    .btn:hover{background:rgba(255,255,255,.08)}
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(96,165,250,.25), rgba(94,234,212,.18));
+      border-color: rgba(94,234,212,.25);
+    }
+    .user{
+      display:flex; align-items:center; gap:10px;
+      padding:8px 10px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.04);
+    }
+    .avatar{
+      width:34px;height:34px;border-radius:12px;
+      background:linear-gradient(135deg, rgba(251,191,36,.9), rgba(96,165,250,.8));
+    }
+    .user b{font-size:13px; display:block}
+    .user span{font-size:12px; color:var(--muted); display:block; margin-top:2px}
+
+    /* Layout blocks */
+    .grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:14px;
+    }
+    .panel{
+      border-radius: var(--radius);
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.04);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:14px 16px;
+      border-bottom:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.04), transparent);
+    }
+    .panel header h2{
+      margin:0;
+      font-size:14px;
+      letter-spacing:.2px;
+    }
+    .panel header .sub{color:var(--muted); font-size:12px}
+    .panel .content{padding:14px 16px}
+
+    /* KPIs */
+    .kpis{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:12px;
+      margin-bottom:14px;
+    }
+    .kpi{
+      padding:14px 14px;
+      border-radius: var(--radius);
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.04);
+      box-shadow: var(--shadow);
+    }
+    .kpi .label{color:var(--muted); font-size:12px}
+    .kpi .value{font-size:22px; margin-top:6px; font-weight:700}
+    .kpi .delta{
+      margin-top:8px;
+      font-size:12px;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.04);
+      color:var(--muted);
+    }
+    .dot{width:8px;height:8px;border-radius:999px; background:var(--good)}
+    .dot.warn{background:var(--warn)}
+    .dot.bad{background:var(--bad)}
+
+    /* Tables */
+    .table{
+      width:100%;
+      border-collapse: collapse;
+      overflow:hidden;
+      border-radius: 12px;
+    }
+    .table th, .table td{
+      text-align:left;
+      padding:10px 10px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      font-size:13px;
+      color:var(--text);
+      vertical-align:top;
+    }
+    .table th{
+      color:var(--muted);
+      font-weight:600;
+      font-size:12px;
+      letter-spacing:.2px;
+      background:rgba(255,255,255,.03);
+    }
+    .badge{
+      font-size:12px;
+      padding:3px 8px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.05);
+      color:var(--muted);
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      white-space:nowrap;
+    }
+    .badge.good{border-color:rgba(52,211,153,.35); background:rgba(52,211,153,.10); color:#bff7e3}
+    .badge.warn{border-color:rgba(251,191,36,.35); background:rgba(251,191,36,.10); color:#ffe6aa}
+    .badge.bad{border-color:rgba(251,113,133,.35); background:rgba(251,113,133,.10); color:#ffd1da}
+
+    /* Cards lists */
+    .list{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .item{
+      padding:12px 12px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.03);
+      border-radius:14px;
+    }
+    .item .title{font-weight:700; font-size:13px}
+    .item .meta{color:var(--muted); font-size:12px; margin-top:4px}
+    .item .row{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px}
+
+    /* Filters */
+    .filters{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    select{
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      outline:none;
+      font-size:13px;
+    }
+
+    /* Sections */
+    section{display:none}
+    section.active{display:block}
+
+    /* Responsive */
+    @media (max-width: 1080px){
+      .kpis{grid-template-columns: repeat(2, 1fr);}
+      .grid{grid-template-columns: 1fr;}
+      .sidebar{position:relative; height:auto}
+      .app{grid-template-columns: 1fr}
+      .sidebar-footer{position:relative; left:auto; right:auto; bottom:auto; margin-top:14px}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>ToolPro Intranet</h1>
+          <small>Vente d’outils • Interne</small>
+        </div>
+      </div>
+
+      <nav class="nav" id="nav">
+        <a href="#dashboard" class="active" data-section="dashboard">📊 Tableau de bord <span class="chip">Live</span></a>
+        <a href="#stock" data-section="stock">📦 Stock & Produits <span class="chip" id="chipLow">—</span></a>
+        <a href="#orders" data-section="orders">🧾 Commandes <span class="chip" id="chipOrders">—</span></a>
+        <a href="#support" data-section="support">🛠️ SAV / Tickets <span class="chip" id="chipTickets">—</span></a>
+        <a href="#directory" data-section="directory">👥 Annuaire</a>
+        <a href="#docs" data-section="docs">📚 Procédures</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="row">
+          <div>
+            <div style="font-weight:700;font-size:13px;">Statut</div>
+            <div style="color:var(--muted);font-size:12px;margin-top:3px;">Semaine 02 • 2026</div>
+          </div>
+          <span class="pill" id="statusPill">OK</span>
+        </div>
+        <div style="margin-top:10px;color:var(--muted);font-size:12px;line-height:1.4;">
+          Astuce : cherche “perceuse”, “T-104” ou “Dupont” dans la barre en haut.
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="search" role="search">
+          🔎
+          <input id="globalSearch" placeholder="Rechercher produit, commande, ticket, employé…" autocomplete="off" />
+        </div>
+        <div class="actions">
+          <button class="btn" id="btnRefresh" title="Rafraîchir">⟳</button>
+          <button class="btn primary" id="btnNew" title="Créer">＋ Nouveau</button>
+          <div class="user" title="Profil">
+            <div class="avatar" aria-hidden="true"></div>
+            <div>
+              <b>Laura Martin</b>
+              <span>Opérations • Paris</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DASHBOARD -->
+      <section id="dashboard" class="active">
+        <div class="kpis" id="kpis"></div>
+
+        <div class="grid">
+          <div class="panel">
+            <header>
+              <div>
+                <h2>Annonces internes</h2>
+                <div class="sub">Infos du jour, promos, sécurité</div>
+              </div>
+              <span class="badge">📰 3</span>
+            </header>
+            <div class="content">
+              <div class="list" id="announcements"></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <header>
+              <div>
+                <h2>À traiter</h2>
+                <div class="sub">Priorités du jour</div>
+              </div>
+              <span class="badge warn">⏱️ Priorité</span>
+            </header>
+            <div class="content">
+              <div class="list" id="todo"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STOCK -->
+      <section id="stock">
+        <div class="panel">
+          <header>
+            <div>
+              <h2>Stock & Produits</h2>
+              <div class="sub">Références, niveaux, alertes</div>
+            </div>
+            <div class="filters">
+              <select id="stockFilter">
+                <option value="all">Tous</option>
+                <option value="low">Stock faible</option>
+                <option value="ok">Stock OK</option>
+              </select>
+              <select id="catFilter">
+                <option value="all">Toutes catégories</option>
+                <option value="Electroportatif">Électroportatif</option>
+                <option value="Mesure">Mesure</option>
+                <option value="Protection">Protection</option>
+                <option value="Consommable">Consommable</option>
+              </select>
+            </div>
+          </header>
+          <div class="content">
+            <table class="table" id="stockTable"></table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ORDERS -->
+      <section id="orders">
+        <div class="panel">
+          <header>
+            <div>
+              <h2>Commandes</h2>
+              <div class="sub">Dernières ventes & statuts</div>
+            </div>
+            <div class="filters">
+              <select id="orderFilter">
+                <option value="all">Tous statuts</option>
+                <option value="Préparation">Préparation</option>
+                <option value="Expédiée">Expédiée</option>
+                <option value="En attente">En attente</option>
+              </select>
+            </div>
+          </header>
+          <div class="content">
+            <table class="table" id="ordersTable"></table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SUPPORT -->
+      <section id="support">
+        <div class="panel">
+          <header>
+            <div>
+              <h2>SAV / Tickets</h2>
+              <div class="sub">Retours, incidents, demandes</div>
+            </div>
+            <div class="filters">
+              <select id="ticketFilter">
+                <option value="all">Toutes priorités</option>
+                <option value="P1">P1 (Urgent)</option>
+                <option value="P2">P2</option>
+                <option value="P3">P3</option>
+              </select>
+            </div>
+          </header>
+          <div class="content">
+            <table class="table" id="ticketsTable"></table>
+          </div>
+        </div>
+      </section>
+
+      <!-- DIRECTORY -->
+      <section id="directory">
+        <div class="panel">
+          <header>
+            <div>
+              <h2>Annuaire</h2>
+              <div class="sub">Équipes & contacts</div>
+            </div>
+            <span class="badge" id="chipPeople">—</span>
+          </header>
+          <div class="content">
+            <table class="table" id="peopleTable"></table>
+          </div>
+        </div>
+      </section>
+
+      <!-- DOCS -->
+      <section id="docs">
+        <div class="panel">
+          <header>
+            <div>
+              <h2>Procédures & Liens utiles</h2>
+              <div class="sub">Onboarding, livraison, retours, sécurité</div>
+            </div>
+            <span class="badge">📌</span>
+          </header>
+          <div class="content">
+            <div class="list">
+              <div class="item">
+                <div class="title">Procédure — Préparation de commande (Pick & Pack)</div>
+                <div class="meta">Étapes : impression, picking, contrôle, emballage, étiquette, dépôt transporteur.</div>
+              </div>
+              <div class="item">
+                <div class="title">Procédure — Retours & garantie (SAV)</div>
+                <div class="meta">Créer un ticket, valider la garantie, proposer échange/avoir/remboursement, clôturer.</div>
+              </div>
+              <div class="item">
+                <div class="title">Sécurité — EPI et zone expédition</div>
+                <div class="meta">Gants & lunettes obligatoires, cutter sécurisé, stockage batteries/solvants.</div>
+              </div>
+              <div class="item">
+                <div class="title">Lien — Catalogue produits (interne)</div>
+                <div class="meta">À connecter à votre vrai PIM/ERP plus tard (ex : Odoo, Shopify, SAP…).</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    // ---------- Données fictives ----------
+    const data = {
+      kpis: [
+        { label: "Chiffre d’affaires (7j)", value: "48 920 €", dot: "good", delta: "+6.2% vs semaine dernière" },
+        { label: "Commandes à préparer", value: "17", dot: "warn", delta: "6 en attente de stock" },
+        { label: "Ruptures / Stock faible", value: "5", dot: "bad", delta: "Réappro à lancer" },
+        { label: "Tickets SAV ouverts", value: "9", dot: "warn", delta: "2 urgents (P1)" },
+      ],
+      announcements: [
+        { title: "Promo interne : -10% sur consommables (jusqu’au 31/01)", meta: "Marketing • Applicable aux clients B2B (codes pro)" },
+        { title: "Nouveau transporteur : ramasse à 16h30", meta: "Logistique • Prévoir scan colis avant 16h10" },
+        { title: "Sécurité atelier : lunettes obligatoires zone coupe", meta: "RH • Contrôle hebdo" },
+      ],
+      todo: [
+        { title: "Lancer réappro : Lames cutter (C-018)", meta: "Stock faible • Fournisseur : SafeCut" , badge:"P2" },
+        { title: "Vérifier paiement commande #A-1042", meta: "Client : BTP Dupont • Virement en attente", badge:"P1" },
+        { title: "Traiter retour perceuse (ticket T-104)", meta: "Blocage : photos manquantes", badge:"P3" },
+      ],
+      stock: [
+        { sku:"E-201", produit:"Perceuse sans fil 18V", categorie:"Electroportatif", stock: 12, seuil: 8, emplacement:"A-3", prix:"129 €" },
+        { sku:"E-202", produit:"Visseuse impact 20V", categorie:"Electroportatif", stock: 4, seuil: 6, emplacement:"A-4", prix:"149 €" },
+        { sku:"M-110", produit:"Mètre ruban 5m", categorie:"Mesure", stock: 25, seuil: 10, emplacement:"B-1", prix:"9.90 €" },
+        { sku:"P-055", produit:"Lunettes de protection", categorie:"Protection", stock: 7, seuil: 12, emplacement:"C-2", prix:"6.50 €" },
+        { sku:"C-018", produit:"Lames cutter (x10)", categorie:"Consommable", stock: 3, seuil: 15, emplacement:"C-4", prix:"4.20 €" },
+        { sku:"M-240", produit:"Niveau à bulle 60cm", categorie:"Mesure", stock: 9, seuil: 8, emplacement:"B-3", prix:"14.90 €" },
+      ],
+      orders: [
+        { id:"#A-1042", client:"BTP Dupont", date:"2026-01-07", total:"980 €", statut:"En attente", items:"Perceuse 18V ×2, EPI ×10" },
+        { id:"#A-1041", client:"Atelier Morel", date:"2026-01-06", total:"245 €", statut:"Préparation", items:"Visseuse impact ×1, Mètre 5m ×10" },
+        { id:"#A-1039", client:"Société Rivière", date:"2026-01-05", total:"1 420 €", statut:"Expédiée", items:"Outillage mix ×1 lot" },
+        { id:"#A-1038", client:"Chantier Nova", date:"2026-01-05", total:"88 €", statut:"Préparation", items:"Lames cutter ×12, Lunettes ×5" },
+      ],
+      tickets: [
+        { id:"T-104", sujet:"Retour perceuse 18V (batterie ne charge plus)", client:"BTP Dupont", priorite:"P2", statut:"Ouvert", age:"2j" },
+        { id:"T-105", sujet:"Colis endommagé à réception", client:"Atelier Morel", priorite:"P1", statut:"Ouvert", age:"1j" },
+        { id:"T-101", sujet:"Demande facture rectificative", client:"Chantier Nova", priorite:"P3", statut:"En cours", age:"4j" },
+        { id:"T-099", sujet:"Erreur de référence livrée (mètre 3m au lieu 5m)", client:"Société Rivière", priorite:"P2", statut:"Ouvert", age:"6j" },
+      ],
+      people: [
+        { nom:"Laura Martin", equipe:"Opérations", role:"Coordinatrice", email:"laura@toolpro.local", tel:"+33 6 00 00 00 00" },
+        { nom:"Julie Bernard", equipe:"Marketing", role:"Content & CRM", email:"julie@toolpro.local", tel:"+33 6 00 00 00 01" },
+        { nom:"Karim Benali", equipe:"Logistique", role:"Responsable expédition", email:"karim@toolpro.local", tel:"+33 6 00 00 00 02" },
+        { nom:"Chloé Perrin", equipe:"SAV", role:"Technicienne", email:"chloe@toolpro.local", tel:"+33 6 00 00 00 03" },
+      ],
+    };
+
+    // ---------- Helpers ----------
+    const $ = (sel) => document.querySelector(sel);
+    const $$ = (sel) => document.querySelectorAll(sel);
+
+    function badgeForStock(stock, seuil){
+      if(stock <= Math.max(2, Math.floor(seuil*0.5))) return `<span class="badge bad"><span class="dot bad"></span> Critique</span>`;
+      if(stock < seuil) return `<span class="badge warn"><span class="dot warn"></span> Faible</span>`;
+      return `<span class="badge good"><span class="dot"></span> OK</span>`;
+    }
+
+    function badgeForOrderStatus(s){
+      if(s === "Expédiée") return `<span class="badge good"><span class="dot"></span> ${s}</span>`;
+      if(s === "Préparation") return `<span class="badge warn"><span class="dot warn"></span> ${s}</span>`;
+      return `<span class="badge"><span class="dot bad"></span> ${s}</span>`;
+    }
+
+    function badgeForPriority(p){
+      if(p === "P1") return `<span class="badge bad"><span class="dot bad"></span> ${p}</span>`;
+      if(p === "P2") return `<span class="badge warn"><span class="dot warn"></span> ${p}</span>`;
+      return `<span class="badge"><span class="dot"></span> ${p}</span>`;
+    }
+
+    function setActiveSection(id){
+      $$("section").forEach(s => s.classList.toggle("active", s.id === id));
+      $$("#nav a").forEach(a => a.classList.toggle("active", a.dataset.section === id));
+      location.hash = id;
+    }
+
+    // ---------- Render ----------
+    function render(){
+      // KPIs
+      $("#kpis").innerHTML = data.kpis.map(k => `
+        <div class="kpi">
+          <div class="label">${k.label}</div>
+          <div class="value">${k.value}</div>
+          <div class="delta"><span class="dot ${k.dot === "warn" ? "warn" : k.dot === "bad" ? "bad" : ""}"></span>${k.delta}</div>
+        </div>
+      `).join("");
+
+      // Announcements
+      $("#announcements").innerHTML = data.announcements.map(a => `
+        <div class="item">
+          <div class="title">${a.title}</div>
+          <div class="meta">${a.meta}</div>
+        </div>
+      `).join("");
+
+      // Todo
+      $("#todo").innerHTML = data.todo.map(t => `
+        <div class="item">
+          <div class="title">${t.title}</div>
+          <div class="meta">${t.meta}</div>
+          <div class="row">
+            ${badgeForPriority(t.badge)}
+            <button class="btn" style="padding:8px 10px;font-size:13px;">Ouvrir</button>
+          </div>
+        </div>
+      `).join("");
+
+      // Stock
+      $("#stockTable").innerHTML = `
+        <thead>
+          <tr>
+            <th>SKU</th><th>Produit</th><th>Catégorie</th><th>Stock</th><th>Emplacement</th><th>Prix</th><th>Statut</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.stock.map(p => `
+            <tr>
+              <td>${p.sku}</td>
+              <td><b>${p.produit}</b></td>
+              <td>${p.categorie}</td>
+              <td>${p.stock} <span style="color:var(--muted)">/ seuil ${p.seuil}</span></td>
+              <td>${p.emplacement}</td>
+              <td>${p.prix}</td>
+              <td>${badgeForStock(p.stock, p.seuil)}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      `;
+
+      // Orders
+      $("#ordersTable").innerHTML = `
+        <thead>
+          <tr>
+            <th>Commande</th><th>Client</th><th>Date</th><th>Articles</th><th>Total</th><th>Statut</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.orders.map(o => `
+            <tr>
+              <td><b>${o.id}</b></td>
+              <td>${o.client}</td>
+              <td>${o.date}</td>
+              <td style="color:var(--muted)">${o.items}</td>
+              <td>${o.total}</td>
+              <td>${badgeForOrderStatus(o.statut)}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      `;
+
+      // Tickets
+      $("#ticketsTable").innerHTML = `
+        <thead>
+          <tr>
+            <th>Ticket</th><th>Sujet</th><th>Client</th><th>Priorité</th><th>Statut</th><th>Âge</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.tickets.map(t => `
+            <tr>
+              <td><b>${t.id}</b></td>
+              <td>${t.sujet}</td>
+              <td>${t.client}</td>
+              <td>${badgeForPriority(t.priorite)}</td>
+              <td>${t.statut}</td>
+              <td style="color:var(--muted)">${t.age}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      `;
+
+      // People
+      $("#peopleTable").innerHTML = `
+        <thead>
+          <tr>
+            <th>Nom</th><th>Équipe</th><th>Rôle</th><th>Email</th><th>Téléphone</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.people.map(p => `
+            <tr>
+              <td><b>${p.nom}</b></td>
+              <td>${p.equipe}</td>
+              <td>${p.role}</td>
+              <td><a href="mailto:${p.email}" style="color:var(--accent2)">${p.email}</a></td>
+              <td style="color:var(--muted)">${p.tel}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      `;
+
+      // Chips
+      const lowCount = data.stock.filter(p => p.stock < p.seuil).length;
+      $("#chipLow").textContent = lowCount;
+      $("#chipOrders").textContent = data.orders.length;
+      $("#chipTickets").textContent = data.tickets.filter(t => t.statut !== "Clos").length;
+      $("#chipPeople").textContent = `${data.people.length} personnes`;
+
+      // Status pill
+      $("#statusPill").textContent = lowCount >= 5 ? "Alerte" : (lowCount >= 2 ? "Surveillance" : "OK");
+      $("#statusPill").style.borderColor = lowCount >= 5 ? "rgba(251,113,133,.45)" : lowCount >= 2 ? "rgba(251,191,36,.45)" : "rgba(52,211,153,.35)";
+      $("#statusPill").style.background = lowCount >= 5 ? "rgba(251,113,133,.12)" : lowCount >= 2 ? "rgba(251,191,36,.12)" : "rgba(52,211,153,.10)";
+      $("#statusPill").style.color = lowCount >= 5 ? "#ffd1da" : lowCount >= 2 ? "#ffe6aa" : "#bff7e3";
+    }
+
+    // ---------- Filters + Search ----------
+    function applyStockFilters(){
+      const mode = $("#stockFilter").value;
+      const cat = $("#catFilter").value;
+      const q = $("#globalSearch").value.trim().toLowerCase();
+
+      const filtered = data.stock.filter(p => {
+        const matchesMode = mode === "all" ? true : (mode === "low" ? p.stock < p.seuil : p.stock >= p.seuil);
+        const matchesCat = cat === "all" ? true : p.categorie === cat;
+        const matchesQuery = !q ? true : (
+          p.sku.toLowerCase().includes(q) ||
+          p.produit.toLowerCase().includes(q) ||
+          p.categorie.toLowerCase().includes(q)
+        );
+        return matchesMode && matchesCat && matchesQuery;
+      });
+
+      $("#stockTable").innerHTML = `
+        <thead>
+          <tr>
+            <th>SKU</th><th>Produit</th><th>Catégorie</th><th>Stock</th><th>Emplacement</th><th>Prix</th><th>Statut</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filtered.map(p => `
+            <tr>
+              <td>${p.sku}</td>
+              <td><b>${p.produit}</b></td>
+              <td>${p.categorie}</td>
+              <td>${p.stock} <span style="color:var(--muted)">/ seuil ${p.seuil}</span></td>
+              <td>${p.emplacement}</td>
+              <td>${p.prix}</td>
+              <td>${badgeForStock(p.stock, p.seuil)}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      `;
+    }
+
+    function applyOrderFilters(){
+      const status = $("#orderFilter").value;
+      const q = $("#globalSearch").value.trim().toLowerCase();
+      const filtered = data.orders.filter(o => {
+        const matchesStatus = status === "all" ? true : o.statut === status;
+        const matchesQuery = !q ? true : (
+          o.id.toLowerCase().includes(q) ||
+          o.client.toLowerCase().includes(q) ||
+          o.items.toLowerCase().includes(q)
+        );
+        return matchesStatus && matchesQuery;
+      });
+
+      $("#ordersTable").innerHTML = `
+        <thead>
+          <tr>
+            <th>Commande</th><th>Client</th><th>Date</th><th>Articles</th><th>Total</th><th>Statut</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filtered.map(o => `
+            <tr>
+              <td><b>${o.id}</b></td>
+              <td>${o.client}</td>
+              <td>${o.date}</td>
+              <td style="color:var(--muted)">${o.items}</td>
+              <td>${o.total}</td>
+              <td>${badgeForOrderStatus(o.statut)}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      `;
+    }
+
+    function applyTicketFilters(){
+      const prio = $("#ticketFilter").value;
+      const q = $("#globalSearch").value.trim().toLowerCase();
+      const filtered = data.tickets.filter(t => {
+        const matchesPrio = prio === "all" ? true : t.priorite === prio;
+        const matchesQuery = !q ? true : (
+          t.id.toLowerCase().includes(q) ||
+          t.sujet.toLowerCase().includes(q) ||
+          t.client.toLowerCase().includes(q) ||
+          t.priorite.toLowerCase().includes(q)
+        );
+        return matchesPrio && matchesQuery;
+      });
+
+      $("#ticketsTable").innerHTML = `
+        <thead>
+          <tr>
+            <th>Ticket</th><th>Sujet</th><th>Client</th><th>Priorité</th><th>Statut</th><th>Âge</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filtered.map(t => `
+            <tr>
+              <td><b>${t.id}</b></td>
+              <td>${t.sujet}</td>
+              <td>${t.client}</td>
+              <td>${badgeForPriority(t.priorite)}</td>
+              <td>${t.statut}</td>
+              <td style="color:var(--muted)">${t.age}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      `;
+    }
+
+    function applyPeopleSearch(){
+      const q = $("#globalSearch").value.trim().toLowerCase();
+      const filtered = data.people.filter(p => {
+        if(!q) return true;
+        return (
+          p.nom.toLowerCase().includes(q) ||
+          p.equipe.toLowerCase().includes(q) ||
+          p.role.toLowerCase().includes(q) ||
+          p.email.toLowerCase().includes(q)
+        );
+      });
+
+      $("#peopleTable").innerHTML = `
+        <thead>
+          <tr>
+            <th>Nom</th><th>Équipe</th><th>Rôle</th><th>Email</th><th>Téléphone</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filtered.map(p => `
+            <tr>
+              <td><b>${p.nom}</b></td>
+              <td>${p.equipe}</td>
+              <td>${p.role}</td>
+              <td><a href="mailto:${p.email}" style="color:var(--accent2)">${p.email}</a></td>
+              <td style="color:var(--muted)">${p.tel}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      `;
+    }
+
+    function applyGlobal(){
+      applyStockFilters();
+      applyOrderFilters();
+      applyTicketFilters();
+      applyPeopleSearch();
+    }
+
+    // ---------- Navigation ----------
+    $("#nav").addEventListener("click", (e) => {
+      const link = e.target.closest("a[data-section]");
+      if(!link) return;
+      e.preventDefault();
+      setActiveSection(link.dataset.section);
+      applyGlobal();
+    });
+
+    // ---------- Events ----------
+    $("#stockFilter").addEventListener("change", applyStockFilters);
+    $("#catFilter").addEventListener("change", applyStockFilters);
+    $("#orderFilter").addEventListener("change", applyOrderFilters);
+    $("#ticketFilter").addEventListener("change", applyTicketFilters);
+    $("#globalSearch").addEventListener("input", applyGlobal);
+
+    $("#btnRefresh").addEventListener("click", () => {
+      // Ici tu brancheras des appels API. Pour la démo on re-render.
+      render();
+      applyGlobal();
+    });
+
+    $("#btnNew").addEventListener("click", () => {
+      alert("Démo : ici tu peux ouvrir une modale 'Nouveau ticket / Produit / Commande'.");
+    });
+
+    // ---------- Init ----------
+    render();
+
+    // hash deep-link
+    const initial = (location.hash || "#dashboard").replace("#","");
+    const ids = ["dashboard","stock","orders","support","directory","docs"];
+    setActiveSection(ids.includes(initial) ? initial : "dashboard");
+    applyGlobal();
+  </script>
+</body>
+</html>
